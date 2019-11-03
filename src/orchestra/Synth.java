@@ -195,13 +195,17 @@ public class Synth {
 		
 		long tick = 0;
 		ArrayList<Note> notes = midi.getNotes(tick);
+		int p;
 		while(notes != null)
 		{
+			p = (int)((tick / (double)midi.maxTick) * 100);
+			progress(p, tick == 0, false);
 			play(notes);
 			notes = midi.getNotes(tick);
 			busyWaitMicros(midi.tickDuration);
 			tick++;
 		}
+		progress(100, false, true);
 	}
 
 	public void play(ArrayList<Note> notes)
@@ -246,6 +250,29 @@ public class Synth {
             ;
         }
     }
+	
+	private void progress(int p, boolean first, boolean last)
+	{
+		String str = "";
+		for(int i = 0; i < 100; i++)
+		{
+			if(i < p)
+				str += "=";
+			else if(i == p && i != 100)
+				str += ">";
+			else
+				str += " ";
+		}
+		if(first)
+		{
+			System.out.print("\n");
+		}
+		System.out.print("Playing [" + str + "] " + p + "%");
+		if(last)
+			System.out.print("\n");
+		else
+		System.out.print("\r");
+	}
 	
 	/**
 	 * Returns the MIDI id for a given note: eg. 4C -> 60
